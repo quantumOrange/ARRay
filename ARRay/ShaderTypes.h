@@ -1,8 +1,8 @@
 //
 //  ShaderTypes.h
-//  ARRay
+//  ARMetalTest
 //
-//  Created by David Crooks on 15/02/2019.
+//  Created by David Crooks on 07/02/2019.
 //  Copyright © 2019 David Crooks. All rights reserved.
 //
 
@@ -47,6 +47,8 @@ typedef struct {
     matrix_float4x4 projectionMatrix;
     matrix_float4x4 viewMatrix;
     
+    
+    vector_float2  pixelSize;
     // Lighting Properties
     vector_float3 ambientLightColor;
     vector_float3 directionalLightDirection;

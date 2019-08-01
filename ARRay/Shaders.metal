@@ -1,8 +1,8 @@
 //
 //  Shaders.metal
-//  ARRay
+//  ARMetalTest
 //
-//  Created by David Crooks on 15/02/2019.
+//  Created by David Crooks on 07/02/2019.
 //  Copyright © 2019 David Crooks. All rights reserved.
 //
 
@@ -63,13 +63,11 @@ fragment float4 capturedImageFragmentShader(ImageColorInOut in [[stage_in]],
     return ycbcrToRGBTransform * ycbcr;
 }
 
-
 typedef struct {
     float3 position [[attribute(kVertexAttributePosition)]];
     float2 texCoord [[attribute(kVertexAttributeTexcoord)]];
     half3 normal    [[attribute(kVertexAttributeNormal)]];
 } Vertex;
-
 
 typedef struct {
     float4 position [[position]];
@@ -77,7 +75,6 @@ typedef struct {
     half3  eyePosition;
     half3  normal;
 } ColorInOut;
-
 
 // Anchor geometry vertex function
 vertex ColorInOut anchorGeometryVertexTransform(Vertex in [[stage_in]],
@@ -166,3 +163,57 @@ fragment float4 anchorGeometryFragmentLighting(ColorInOut in [[stage_in]],
     // colorMap for this fragment's alpha value
     return float4(color, in.color.w);
 }
+
+typedef struct {
+    float4 position [[attribute(kVertexAttributePosition)]];
+    //float2 texCoord [[attribute(kVertexAttributeTexcoord)]];
+    float4 color [[attribute(1)]];
+} PointVertex;
+
+
+typedef struct {
+    float4 position [[position]];
+    float pointSize [[point_size]];
+    float4 color;
+} PointInOut;
+
+
+vertex PointInOut pointVertex(PointVertex in [[stage_in]],
+                                  constant SharedUniforms &sharedUniforms [[ buffer(kBufferIndexSharedUniforms) ]]
+                               )
+{
+    PointInOut vertexOut;
+   
+    float4 position = in.position;
+    
+   // float4x4 modelMatrix = instanceUniforms[iid].modelMatrix;
+    float4x4 modelViewMatrix = sharedUniforms.viewMatrix ;
+    
+    // Calculate the position of our vertex in clip space and output for clipping and rasterization
+    float4x4 mvpMatrix = sharedUniforms.projectionMatrix * modelViewMatrix;
+    
+    //vertexOut.position = sharedUniforms.projectionMatrix * modelViewMatrix * position;
+    vertexOut.position = mvpMatrix * position;
+    //vertexOut.position = in;
+    float pointSizeMeters = 0.05;
+    
+    float pointSizeScreenSpace = pointSizeMeters * sharedUniforms.projectionMatrix[1][1]  / vertexOut.position.w;
+    float pointSizeScreenPixels = pointSizeScreenSpace * sharedUniforms.pixelSize.y;
+    vertexOut.pointSize =  pointSizeScreenPixels;
+    vertexOut.color = in.color;
+    return vertexOut;
+}
+
+fragment half4 pointFragment(PointInOut in [[stage_in]],
+                               float2 pointCoord [[point_coord]])
+{
+    float dist = length(pointCoord - float2(0.5));
+    //float c = smoothstep(0.38, 0.4, dist);
+    float4 c = in.color;
+    float alpha = 1.0 - smoothstep(0.48, 0.5, dist);
+    float4 out_color = float4(c.r,c.g,c.b,c.a * alpha);
+    
+    return half4(out_color);
+}
+
+

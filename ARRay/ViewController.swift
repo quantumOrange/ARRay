@@ -1,8 +1,8 @@
 //
 //  ViewController.swift
-//  ARRay
+//  ARMetalTest
 //
-//  Created by David Crooks on 15/02/2019.
+//  Created by David Crooks on 07/02/2019.
 //  Copyright © 2019 David Crooks. All rights reserved.
 //
 
@@ -12,6 +12,7 @@ import MetalKit
 import ARKit
 
 extension MTKView : RenderDestinationProvider {
+    
 }
 
 class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
@@ -39,11 +40,11 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             
             // Configure the renderer to draw to the view
             renderer = Renderer(session: session, metalDevice: view.device!, renderDestination: view)
-            
+            //view.drawableSize
             renderer.drawRectResized(size: view.bounds.size)
         }
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewController.handleTap(gestureRecognize:)))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewController.handleTap(gesture:)))
         view.addGestureRecognizer(tapGesture)
     }
     
@@ -65,7 +66,7 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
     }
     
     @objc
-    func handleTap(gestureRecognize: UITapGestureRecognizer) {
+    func handleTap(gesture: UITapGestureRecognizer) {
         // Create anchor using the camera's current position
         if let currentFrame = session.currentFrame {
             
@@ -76,12 +77,46 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             
             // Add a new anchor to the session
             let anchor = ARAnchor(transform: transform)
+            //let an2 = ARAnchor(
+          //  lastId = anchor.identifier
             session.add(anchor: anchor)
+            let origin = float4(0,0,0,1)
+            
+           let p1 = simd_mul(transform,origin)
+           // renderer.points.add(point: float3( p1.x, p1.y, p1.z) )
+            
+           print("p1:\(p1)")
+            
+            let screenPoint = gesture.location(in: view)
+            
+          
+        
+            let xAxis = simd_float3(x: 1,
+                                    y: 0,
+                                    z: 0)
+            
+            
+            let rotation = float4x4(simd_quatf(angle: 0.5 * .pi ,
+                                               axis: xAxis))
+            
+            let plane = simd_mul(transform,rotation)
+            
+           
+        
+            if let p = currentFrame.camera.unprojectPoint(screenPoint, ontoPlane: plane, orientation:interfaceOrientation, viewportSize: view.bounds.size) {
+                renderer.points.add(point:p, color:float4(1.0,0.0,0.0,1.0))
+                print("p:\(p)")
+            }
+            
         }
     }
     
-    // MARK: - MTKViewDelegate
-    
+    @IBAction func selectMode(_ sender: UISegmentedControl) {
+        if let mode = DisplayMode(rawValue:sender.selectedSegmentIndex) {
+            renderer.displayMode = mode
+        }
+        //switsender.selectedSegmentIndex
+    }
     // Called whenever view changes orientation or layout is changed
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
         renderer.drawRectResized(size: size)

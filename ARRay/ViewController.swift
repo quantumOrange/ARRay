@@ -72,19 +72,16 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             
             // Create a transform with a translation of 0.2 meters in front of the camera
             var translation = matrix_identity_float4x4
-            translation.columns.3.z = -0.2
+            translation.columns.3.z = -1.0
             let transform = simd_mul(currentFrame.camera.transform, translation)
             
             // Add a new anchor to the session
             let anchor = ARAnchor(transform: transform)
             
             session.add(anchor: anchor)
-            let origin = float4(0,0,0,1)
+            let origin = SIMD4<Float>(0,0,0,1)
             
            let p1 = simd_mul(transform,origin)
-           // renderer.points.add(point: float3( p1.x, p1.y, p1.z) )
-            
-           print("p1:\(p1)")
             
             let screenPoint = gesture.location(in: view)
             
@@ -100,10 +97,9 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             
             let plane = simd_mul(transform,rotation)
             
-           
-        
             if let p = currentFrame.camera.unprojectPoint(screenPoint, ontoPlane: plane, orientation:interfaceOrientation, viewportSize: view.bounds.size) {
-                renderer.points.add(point:p, color:float4(1.0,0.0,0.0,1.0))
+                renderer.points.add(point:p, color:SIMD4<Float>(1.0,0.0,0.0,1.0))
+                renderer.sharedUniforms.objectPosition = p
                 print("p:\(p)")
             }
             

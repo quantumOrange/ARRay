@@ -54,11 +54,13 @@ struct Trace {
     float3     p;
     Ray      ray;
     Material material;
+    bool hit;
     
-    Trace(float dist, float3 p,Ray ray, Material material): dist(dist),
+    Trace(float dist, float3 p,Ray ray, Material material,bool hit): dist(dist),
     p(p),
     ray(ray),
-    material(material) {}
+    material(material),
+    hit(hit)  {}
 };
 
 
@@ -189,12 +191,9 @@ MapValue sphere(float3 p, float3 center, float radius, Material m) {
 //////////////////////////////////////////////////////////////////////
 /////////////////////// Map The Scene ////////////////////////////////
 
-MapValue map(float3 p, Materials m){
+MapValue map(float3 p, Materials m,float3 center){
     
-    
-    MapValue obj  = sphere(p,float3(0.0),0.5, m.white);
-    
-    
+    MapValue obj  = sphere(p,center,0.2, m.white);
     
     return obj;
 }
@@ -203,44 +202,50 @@ MapValue map(float3 p, Materials m){
 //////////////////////////////////////////////////////////////////////
 /////////////////////// Raytracing ///////////////////////////////////
 
-float3 calculateNormal(float3 p, Materials m) {
+float3 calculateNormal(float3 p, Materials m, float3 c) {
     float epsilon = 0.001;
     
     float3 normal = float3(
-                           map(p +float3(epsilon,0,0),m).signedDistance - map(p - float3(epsilon,0,0),m).signedDistance,
-                           map(p +float3(0,epsilon,0),m).signedDistance - map(p - float3(0,epsilon,0),m).signedDistance,
-                           map(p +float3(0,0,epsilon),m).signedDistance - map(p - float3(0,0,epsilon),m).signedDistance
+                           map(p +float3(epsilon,0,0),m,c).signedDistance - map(p - float3(epsilon,0,0),m,c).signedDistance,
+                           map(p +float3(0,epsilon,0),m,c).signedDistance - map(p - float3(0,epsilon,0),m,c).signedDistance,
+                           map(p +float3(0,0,epsilon),m,c).signedDistance - map(p - float3(0,0,epsilon),m,c).signedDistance
                            );
     
     return normalize(normal);
 }
 
 
-Trace traceRay(Ray ray, float maxDistance, Materials m) {
+Trace traceRay(Ray ray, float maxDistance, Materials m, float3 center) {
     float dist = 0.01;
     float presicion = 0.002;
     float3 p;
     MapValue mv;
-    
+    bool hit = false;
     for(int i=0; i<64; i++){
         p = rayPoint(ray,dist);
-        mv = map(p,m);
+        mv = map(p,m,center);
         dist += 0.5*mv.signedDistance;
-        if(mv.signedDistance < presicion || dist>maxDistance) break;
+        if(mv.signedDistance < presicion) {
+            hit = true;
+            break;
+        }
+        if(dist>maxDistance) {
+            break;
+        }
         
     }
     
-    return Trace(dist,p,ray,mv.material);
+    return Trace(dist,p,ray,mv.material,hit);
 }
 
-float castShadow(Ray ray, float dist, Materials m){
-    Trace trace = traceRay(ray, dist, m);
+float castShadow(Ray ray, float dist, Materials m, float3 center){
+    Trace trace = traceRay(ray, dist, m, center);
     float maxDist = min(1.0,dist);
     float result = trace.dist/maxDist;
     
     return clamp(result,0.0,1.0);
 }
-
+/*
 Ray cameraRay(float3 viewPoint, float3 lookAtCenter, float2 p , float d){
     float3 v = normalize(lookAtCenter -viewPoint);
     
@@ -256,7 +261,7 @@ Ray cameraRay(float3 viewPoint, float3 lookAtCenter, float2 p , float d){
     
     return ray;
 }
-
+*/
 /////////////////////// Lighting ////////////////////////////////
 
 float3 diffuseLighting(Trace trace, float3 normal, float3 lightColor,float3 lightDir){
@@ -277,31 +282,28 @@ float3 specularLighting(Trace trace, float3 normal, float3 lightColor,float3 lig
 }
 
 
-float3 pointLighting(Trace trace, float3 normal, PointLight light, Materials m){
+float3 pointLighting(Trace trace, float3 normal, PointLight light, Materials m,float3 center){
     float3 lightDir = light.position - trace.p;
     float d = length(lightDir);
     lightDir = normalize(lightDir);
     
     float3 color =  diffuseLighting(trace, normal, light.color.diffuse, lightDir);
     
-    
-    
-    
     color += specularLighting(trace, normal, light.color.specular, lightDir, m);
     
     float  attenuation = 1.0 / (1.0 +  0.1 * d * d);
-    float shadow = castShadow(Ray(trace.p,lightDir),d,m);
+    float shadow = castShadow(Ray(trace.p,lightDir),d,m,center );
     color *= attenuation*shadow;
     return  color;
 }
 
-float3 directionalLighting(Trace trace, float3 normal, DirectionalLight light,Materials m){
+float3 directionalLighting(Trace trace, float3 normal, DirectionalLight light,Materials m,float3 center){
     
     float3 color =  diffuseLighting(trace, normal, light.color.diffuse, light.direction);
     
     color += specularLighting(trace, normal, light.color.specular, light.direction,  m);
     
-    float shadow = castShadow(Ray(trace.p,light.direction),3.0,m);
+    float shadow = castShadow(Ray(trace.p,light.direction),3.0,m,center);
     color *= shadow;
     return  color;
 }
@@ -316,61 +318,40 @@ Lights createLights(float time){
     return lights;
 }
 
-
-float3 lighting(Trace trace, float3 normal, Lights lights, Materials m){
-    float3 color = float3(0.01,0.01,0.1);//ambient color
+float3 lighting(Trace trace, float3 normal, Lights lights, Materials m, float3 c){
+    float3 color = float3(0.75,0.75,0.1);//ambient color
     
-    color += pointLighting(trace, normal,lights.light1,m);
-    color += pointLighting(trace, normal,lights.light2,m) ;
-    color += pointLighting(trace, normal,lights.light3,m) ;
-    color += directionalLighting(trace, normal,lights.dirLight,m);
-    
-    return color;
-}
-
-
-float3 render(float2 p, Materials m, Lights lights){
-    float3 viewpoint = float3(-1.0,1.3,-1.5);
-    
-    float3 lookAt = float3(0.0,-0.1,0.0);
-    
-    Ray ray = cameraRay(viewpoint,lookAt,p,1.7);
-    Trace trace = traceRay(ray,12.0,m);
-    
-    float3 normal = calculateNormal(trace.p,m);
-    float3 color = lighting(trace,normal,lights,m);
+    color += pointLighting(trace, normal,lights.light1,m,c);
+    color += pointLighting(trace, normal,lights.light2,m,c) ;
+    color += pointLighting(trace, normal,lights.light3,m,c) ;
+    color += directionalLighting(trace, normal,lights.dirLight,m,c);
     
     return color;
 }
 
-float3 render(Ray ray, Materials m, Lights lights){
+float4 render(Ray ray, Materials m, Lights lights,float3 center){
 
-    Trace trace = traceRay(ray,12.0,m);
+    Trace trace = traceRay(ray,12.0,m,center);
     
-    float3 normal = calculateNormal(trace.p,m);
-    float3 color = lighting(trace,normal,lights,m);
-    
-    return color;
+    float3 normal = calculateNormal(trace.p,m,center);
+    float3 color = lighting(trace,normal,lights,m,center);
+    float alpha = trace.hit ? 1.0 : 0.0 ;
+    return float4(color,alpha);
 }
-
 
 typedef struct {
     float2 position [[attribute(0)]];
     float3 rayNormal [[attribute(1)]];
 } RayPlaneVertex;
 
-
-
 struct VertexInOut {
     float4 position [[ position ]];
     float3 rayNormal;
 };
 
-
 struct VertexIn {
     float2 position [[attribute(0)]];
 };
-
 
 vertex VertexInOut sdfVertexShader(RayPlaneVertex in [[stage_in]])  {
    
@@ -384,7 +365,6 @@ vertex VertexInOut sdfVertexShader(RayPlaneVertex in [[stage_in]])  {
     return out;
 }
 
-
 fragment half4 sdfFragmentShader(VertexInOut in [[ stage_in ]],constant SharedUniforms &sharedUniforms [[ buffer(kBufferIndexSharedUniforms) ]]) {
     
     Lights lights = createLights(sharedUniforms.time);
@@ -392,12 +372,12 @@ fragment half4 sdfFragmentShader(VertexInOut in [[ stage_in ]],constant SharedUn
     
     Ray ray = Ray(sharedUniforms.cameraPosition, normalize(in.rayNormal));
     
-    float3 colorLinear =  render(ray, m, lights);
+    float4 colorLinear =  render(ray, m, lights, sharedUniforms.objectPosition);
     
     float screenGamma = 2.2;
-    float3 colorGammaCorrected = pow(colorLinear, float3(1.0/screenGamma));
+    float3 colorGammaCorrected = pow(colorLinear.rgb, float3(1.0/screenGamma));
     half3 h = half3(colorGammaCorrected);
-    return half4(h,1.0);
+    return half4(h,colorLinear.a);
     
 }
 

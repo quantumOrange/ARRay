@@ -18,7 +18,6 @@ class SDFRenderer:ARMetalDrawable {
     
     
     var vertexBuffer: MTLBuffer!
-   // var capturedImagePipelineState: MTLRenderPipelineState!
     var depthState: MTLDepthStencilState!
     
     //var textureY: CVMetalTexture?
@@ -35,19 +34,8 @@ class SDFRenderer:ARMetalDrawable {
     
     
     func update(frame: ARFrame) {
-       // print("Update SDFs");
         let verticies = createRayPlaneVerticies(frame: frame, size: viewportSize, orientation: .landscapeRight)
-        
         vertexBuffer?.contents().copyMemory(from: verticies, byteCount: verticies.byteLength)
-        
-        //updateCapturedImageTextures(frame: frame)
-        /*
-        if viewportSizeDidChange {
-            viewportSizeDidChange = false
-            
-            updateImagePlane(frame: frame)
-        }
-         */
     }
     
     
@@ -55,35 +43,7 @@ class SDFRenderer:ARMetalDrawable {
         viewportSize = size
         viewportSizeDidChange = true
     }
-    /*
-    func updateCapturedImageTextures(frame:ARFrame){
-        // Create two textures (Y and CbCr) from the provided frame's captured image
-        let pixelBuffer = frame.capturedImage
-        
-        if (CVPixelBufferGetPlaneCount(pixelBuffer) < 2) {
-            return
-        }
-        
-      //  textureY = createTexture(fromPixelBuffer: pixelBuffer, pixelFormat:.r8Unorm, planeIndex:0)
-      //  textureCbCr = createTexture(fromPixelBuffer: pixelBuffer, pixelFormat:.rg8Unorm, planeIndex:1)
-    }
-    */
-    /*
-    func updateImagePlane(frame: ARFrame) {
-        // Update the texture coordinates of our image plane to aspect fill the viewport
-        let displayToCameraTransform = frame.displayTransform(for: .landscapeRight, viewportSize: viewportSize).inverted()
-        
-        let vertexData = rayPlaneVertexBuffer.contents().assumingMemoryBound(to: Float.self)
-        
-        for index in 0...3 {
-            let textureCoordIndex = 4 * index + 2
-            let textureCoord = CGPoint(x: CGFloat(kImagePlaneVertexData[textureCoordIndex]), y: CGFloat(kImagePlaneVertexData[textureCoordIndex + 1]))
-            let transformedCoord = textureCoord.applying(displayToCameraTransform)
-            vertexData[textureCoordIndex] = Float(transformedCoord.x)
-            vertexData[textureCoordIndex + 1] = Float(transformedCoord.y)
-        }
-    }
-    */
+  
     func createTexture(fromPixelBuffer pixelBuffer: CVPixelBuffer, pixelFormat: MTLPixelFormat, planeIndex: Int) -> CVMetalTexture? {
         
         let width = CVPixelBufferGetWidthOfPlane(pixelBuffer, planeIndex)
@@ -101,11 +61,8 @@ class SDFRenderer:ARMetalDrawable {
     
     func draw(renderEncoder: MTLRenderCommandEncoder, sharedUniformBuffer: MTLBuffer, sharedUniformBufferOffset: Int) {
         
-        guard   //let textureY = textureY,
-               // let textureCbCr = textureCbCr ,
-                let pipelineState = pipelineState
+        guard  let pipelineState = pipelineState
                                                     else { return }
-        // print("Draw SDFs")
         // Push a debug group allowing us to identify render commands in the GPU Frame Capture tool
         renderEncoder.pushDebugGroup("Draw SDF ")
         
@@ -121,7 +78,6 @@ class SDFRenderer:ARMetalDrawable {
         
         // Draw each submesh of our mesh
         renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
-       // renderEncoder.drawPrimitives(type: .point , vertexStart: 0, vertexCount: 4)
         
         renderEncoder.popDebugGroup()
         
@@ -139,7 +95,6 @@ class SDFRenderer:ARMetalDrawable {
         let imagePlaneVertexDataCount = kImagePlaneVertexData.count * MemoryLayout<Float>.size
         vertexBuffer = device.makeBuffer(bytes: kImagePlaneVertexData, length: imagePlaneVertexDataCount, options: [])
         vertexBuffer.label = "ImagePlaneVertexBuffer"
-        
         
         // Load all the shader files with a metal file extension in the project
         let defaultLibrary = device.makeDefaultLibrary()!
@@ -159,29 +114,39 @@ class SDFRenderer:ARMetalDrawable {
         imagePlaneVertexDescriptor.attributes[1].format = .float3
         imagePlaneVertexDescriptor.attributes[1].offset = MemoryLayout<RayPlaneVertex>.offset(of: \RayPlaneVertex.rayNormal)!
         imagePlaneVertexDescriptor.attributes[1].bufferIndex = Int(kBufferIndexMeshPositions.rawValue)
-        
-        let stride =  MemoryLayout<float2>.stride +  MemoryLayout<float3>.stride
-        let rpstride = MemoryLayout<RayPlaneVertex>.stride
       
-        
         // Buffer Layout
         imagePlaneVertexDescriptor.layouts[0].stride = MemoryLayout<RayPlaneVertex>.stride
         imagePlaneVertexDescriptor.layouts[0].stepRate = 1
         imagePlaneVertexDescriptor.layouts[0].stepFunction = .perVertex
         
         // Create a pipeline state for rendering the captured image
-        let capturedImagePipelineStateDescriptor = MTLRenderPipelineDescriptor()
-        capturedImagePipelineStateDescriptor.label = "SDFPipeline"
-        capturedImagePipelineStateDescriptor.sampleCount = renderDestination.sampleCount
-        capturedImagePipelineStateDescriptor.vertexFunction = capturedImageVertexFunction
-        capturedImagePipelineStateDescriptor.fragmentFunction = capturedImageFragmentFunction
-        capturedImagePipelineStateDescriptor.vertexDescriptor = imagePlaneVertexDescriptor
-        capturedImagePipelineStateDescriptor.colorAttachments[0].pixelFormat = renderDestination.colorPixelFormat
-        capturedImagePipelineStateDescriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
-        capturedImagePipelineStateDescriptor.stencilAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
+        let sdfPipelineStateDescriptor = MTLRenderPipelineDescriptor()
+        sdfPipelineStateDescriptor.label = "SDFPipeline"
+        sdfPipelineStateDescriptor.sampleCount = renderDestination.sampleCount
+        sdfPipelineStateDescriptor.vertexFunction = capturedImageVertexFunction
+        sdfPipelineStateDescriptor.fragmentFunction = capturedImageFragmentFunction
+        sdfPipelineStateDescriptor.vertexDescriptor = imagePlaneVertexDescriptor
+        sdfPipelineStateDescriptor.colorAttachments[0].pixelFormat = renderDestination.colorPixelFormat
+        sdfPipelineStateDescriptor.depthAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
+        sdfPipelineStateDescriptor.stencilAttachmentPixelFormat = renderDestination.depthStencilPixelFormat
+        
+        
+        if let attachmentDescriptor = sdfPipelineStateDescriptor.colorAttachments[0] {
+                   attachmentDescriptor.isBlendingEnabled = true
+                   
+                   attachmentDescriptor.rgbBlendOperation = MTLBlendOperation.add
+                   attachmentDescriptor.sourceRGBBlendFactor = MTLBlendFactor.sourceAlpha
+                   attachmentDescriptor.destinationRGBBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
+                   
+                   attachmentDescriptor.alphaBlendOperation = MTLBlendOperation.add
+                   attachmentDescriptor.sourceAlphaBlendFactor = MTLBlendFactor.sourceAlpha
+                   attachmentDescriptor.destinationAlphaBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
+               }
+               
         
         do {
-            try pipelineState = device.makeRenderPipelineState(descriptor: capturedImagePipelineStateDescriptor)
+            try pipelineState = device.makeRenderPipelineState(descriptor: sdfPipelineStateDescriptor)
         } catch let error {
             print("Failed to created sdf pipeline state, error \(error)")
         }

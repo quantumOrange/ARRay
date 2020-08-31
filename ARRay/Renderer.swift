@@ -237,13 +237,20 @@ class Renderer {
     // Flag for viewport size changes
     //var viewportSizeDidChange: Bool = false
     
-    
+    var sharedUniforms:SharedUniforms = SharedUniforms(projectionMatrix:matrix_identity_float4x4 , viewMatrix: matrix_identity_float4x4, cameraPosition: vector_float3(), time: 0, aspectRatio: 1, objectPosition: vector_float3(), pixelSize: vector_float2(), ambientLightColor: vector_float3(), directionalLightDirection: vector_float3(), directionalLightColor: vector_float3(), materialShininess: 1)
     
     func updateSharedUniforms(frame: ARFrame) {
         // Update the shared uniforms of the frame
         
         let uniforms = sharedUniformBufferAddress.assumingMemoryBound(to: SharedUniforms.self)
         
+        uniforms.pointee = sharedUniforms
+        
+        let origin = SIMD4<Float>(0,0,0,1)
+        let cameraPoition4d = simd_mul(frame.camera.transform, origin)
+        let cameraPoition = SIMD3<Float>(cameraPoition4d.x,cameraPoition4d.y,cameraPoition4d.z)
+        
+        uniforms.pointee.cameraPosition =  cameraPoition
         uniforms.pointee.viewMatrix = frame.camera.viewMatrix(for: .landscapeRight)
         uniforms.pointee.projectionMatrix = frame.camera.projectionMatrix(for: .landscapeRight, viewportSize: viewportSize, zNear: 0.001, zFar: 1000)
 
@@ -260,7 +267,7 @@ class Renderer {
         
         
         let drawableSize = renderDestination.drawableSize
-        uniforms.pointee.pixelSize = float2(Float(drawableSize.width),Float(drawableSize.height))
+        uniforms.pointee.pixelSize = SIMD2<Float>(Float(drawableSize.width),Float(drawableSize.height))
         
         var directionalLightDirection : vector_float3 = vector3(0.0, 0.0, -1.0)
         directionalLightDirection = simd_normalize(directionalLightDirection)
@@ -270,6 +277,8 @@ class Renderer {
         uniforms.pointee.directionalLightColor = directionalLightColor * ambientIntensity
         
         uniforms.pointee.materialShininess = 30
+        
+        sharedUniforms = uniforms.pointee
     }
     
     /*

@@ -37,7 +37,8 @@ typedef enum VertexAttributes {
 typedef enum TextureIndices {
     kTextureIndexColor    = 0,
     kTextureIndexY        = 1,
-    kTextureIndexCbCr     = 2
+    kTextureIndexCbCr     = 2,
+    kTextureIndexCube     = 3
 } TextureIndices;
 
 // Structure shared between shader and C code to ensure the layout of shared uniform data accessed in

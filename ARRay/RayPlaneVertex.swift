@@ -11,44 +11,24 @@ import ARKit
 import CoreGraphics
 
 struct RayPlaneVertex {
-    let position:float2
-    let rayNormal:float3
+    let position:SIMD2<Float>
+    let rayNormal:SIMD3<Float>
 }
-
-/*
-let kImagePlaneVertexData: [Float] = [
-    -1.0, -1.0,  0.0, 1.0,
-    1.0, -1.0,  1.0, 1.0,
-    -1.0,  1.0,  0.0, 0.0,
-    1.0,  1.0,  1.0, 0.0,
-]
-*/
     
 func createRayPlaneVerticies(frame:ARFrame, size:CGSize, orientation:UIInterfaceOrientation) -> [RayPlaneVertex] {
     
-    let origin = float4(0,0,0,1)
+    let origin = SIMD4<Float>(0,0,0,1)
     let cameraPoition4d = simd_mul(frame.camera.transform, origin)
-    let cameraPoition = float3(cameraPoition4d.x,cameraPoition4d.y,cameraPoition4d.z)
-    
-    var translation = matrix_identity_float4x4
-    translation.columns.3.z = -0.2
-    let transform = simd_mul(frame.camera.transform, translation)
-    
-    let xAxis = simd_float3(x: 1,
-                            y: 0,
-                            z: 0)
-    
-    let rotation = float4x4(simd_quatf(angle: 0.5 * .pi ,
-                                       axis: xAxis))
-    
-    let plane = simd_mul(transform,rotation)
+    let cameraPoition = SIMD3<Float>(cameraPoition4d.x,cameraPoition4d.y,cameraPoition4d.z)
+        
+    let plane = getScreenParallelPlane(frame: frame)
     
     
     let positions = [
-                        float2(x: -1.0, y: -1.0),
-                        float2(x: 1.0, y: -1.0),
-                        float2(x: -1.0, y: 1.0),
-                        float2(x: 1.0, y: 1.0)
+                        SIMD2<Float>(x: -1.0, y: -1.0),
+                        SIMD2<Float>(x: 1.0, y: -1.0),
+                        SIMD2<Float>(x: -1.0, y: 1.0),
+                        SIMD2<Float>(x: 1.0, y: 1.0)
                     ]
                      
     
@@ -65,12 +45,30 @@ func createRayPlaneVerticies(frame:ARFrame, size:CGSize, orientation:UIInterface
     
     let rayNormals = spacePoints.map {
        
-        return simd_normalize(cameraPoition - $0)
+        return simd_normalize($0-cameraPoition)
     }
     
     return zip( positions, rayNormals ).map(RayPlaneVertex.init)
 }
-    
 
+
+
+func getScreenParallelPlane(frame:ARFrame) ->  simd_float4x4 {
     
+    var translation = matrix_identity_float4x4
+    translation.columns.3.z = -0.2
+    let transform = simd_mul(frame.camera.transform, translation)
+    
+    let xAxis = simd_float3(x: 1,
+                            y: 0,
+                            z: 0)
+    
+    let rotation = float4x4(simd_quatf(angle: 0.5 * .pi ,
+                                       axis: xAxis))
+    
+     
+    return simd_mul(transform,rotation)
+}
+
+
 

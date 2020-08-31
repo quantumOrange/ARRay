@@ -13,8 +13,8 @@ import ARKit
 import MetalKit
 
 struct PointVertex {
-    let position:float3
-    let color:float4
+    let position:SIMD3<Float>
+    let color:SIMD4<Float>
 }
 
 class Points: ARMetalDrawable {
@@ -22,17 +22,17 @@ class Points: ARMetalDrawable {
     
     var depthState: MTLDepthStencilState!
     
-    func add(point:float3, color:float4) {
+    func add(point:SIMD3<Float>, color:SIMD4<Float>) {
         vertices.append(PointVertex(position:point,color:color))
         buildBuffers(device:self.device)
     }
     
     
     func updateBuffer(frame:ARFrame){
-        let v = simd_mul(frame.camera.transform,float4(0,0,0,1))
+        let v = simd_mul(frame.camera.transform,SIMD4<Float>(0,0,0,1))
         
-        func dist(_ p:float3) -> Float {
-            return simd_distance(p,float3(v.x,v.y,v.z))
+        func dist(_ p:SIMD3<Float>) -> Float {
+            return simd_distance(p,SIMD3<Float>(v.x,v.y,v.z))
         }
         
         func furthestFromCamera(_ p:PointVertex,_ q:PointVertex) -> Bool {
@@ -92,7 +92,7 @@ class Points: ARMetalDrawable {
         
         
         vertexDescriptor.attributes[1].format = .float4
-        vertexDescriptor.attributes[1].offset = MemoryLayout<float3>.stride
+        vertexDescriptor.attributes[1].offset = MemoryLayout<SIMD3<Float>>.stride
         vertexDescriptor.attributes[1].bufferIndex = 0
         
         /*

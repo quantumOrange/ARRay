@@ -8,6 +8,7 @@
 
 #include <metal_stdlib>
 using namespace metal;
+#import "ShaderTypes.h"
 
 struct Constants {
     float time;
@@ -384,12 +385,12 @@ vertex VertexInOut sdfVertexShader(RayPlaneVertex in [[stage_in]])  {
 }
 
 
-fragment half4 sdfFragmentShader(VertexInOut in [[ stage_in ]], constant Constants &constants [[buffer(1)]]) {
+fragment half4 sdfFragmentShader(VertexInOut in [[ stage_in ]],constant SharedUniforms &sharedUniforms [[ buffer(kBufferIndexSharedUniforms) ]]) {
     
-    Lights lights = createLights(constants.time);
+    Lights lights = createLights(sharedUniforms.time);
     Materials m = createMaterials();
     
-    Ray ray = Ray(constants.cameraPosition, normalize(in.rayNormal));
+    Ray ray = Ray(sharedUniforms.cameraPosition, normalize(in.rayNormal));
     
     float3 colorLinear =  render(ray, m, lights);
     

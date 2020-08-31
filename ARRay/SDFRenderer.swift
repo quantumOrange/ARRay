@@ -35,7 +35,7 @@ class SDFRenderer:ARMetalDrawable {
     
     
     func update(frame: ARFrame) {
-        
+       // print("Update SDFs");
         let verticies = createRayPlaneVerticies(frame: frame, size: viewportSize, orientation: .landscapeRight)
         
         vertexBuffer?.contents().copyMemory(from: verticies, byteCount: verticies.byteLength)
@@ -105,7 +105,7 @@ class SDFRenderer:ARMetalDrawable {
                // let textureCbCr = textureCbCr ,
                 let pipelineState = pipelineState
                                                     else { return }
-        
+        // print("Draw SDFs")
         // Push a debug group allowing us to identify render commands in the GPU Frame Capture tool
         renderEncoder.pushDebugGroup("Draw SDF ")
         
@@ -117,9 +117,7 @@ class SDFRenderer:ARMetalDrawable {
         // Set mesh's vertex buffers
         renderEncoder.setVertexBuffer(vertexBuffer, offset: 0, index: Int(kBufferIndexMeshPositions.rawValue))
         
-        // Set any textures read/sampled from our render pipeline
-     //   renderEncoder.setFragmentTexture(CVMetalTextureGetTexture(textureY), index: Int(kTextureIndexY.rawValue))
-     //   renderEncoder.setFragmentTexture(CVMetalTextureGetTexture(textureCbCr), index: Int(kTextureIndexCbCr.rawValue))
+        renderEncoder.setFragmentBuffer(sharedUniformBuffer, offset: sharedUniformBufferOffset, index: Int(kBufferIndexSharedUniforms.rawValue))
         
         // Draw each submesh of our mesh
         renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
@@ -136,6 +134,7 @@ class SDFRenderer:ARMetalDrawable {
     }
     
     func loadMetal(device:MTLDevice) {
+        print("SDF Load Metal")
         // Create a vertex buffer with our image plane vertex data.
         let imagePlaneVertexDataCount = kImagePlaneVertexData.count * MemoryLayout<Float>.size
         vertexBuffer = device.makeBuffer(bytes: kImagePlaneVertexData, length: imagePlaneVertexDataCount, options: [])
@@ -153,22 +152,26 @@ class SDFRenderer:ARMetalDrawable {
         
         // Positions.
         imagePlaneVertexDescriptor.attributes[0].format = .float2
-        imagePlaneVertexDescriptor.attributes[0].offset = 0
+        imagePlaneVertexDescriptor.attributes[0].offset = MemoryLayout<RayPlaneVertex>.offset(of:  \RayPlaneVertex.position) ?? 0
         imagePlaneVertexDescriptor.attributes[0].bufferIndex = Int(kBufferIndexMeshPositions.rawValue)
         
         // Ray Normals.
         imagePlaneVertexDescriptor.attributes[1].format = .float3
-        imagePlaneVertexDescriptor.attributes[1].offset = MemoryLayout<float2>.stride
+        imagePlaneVertexDescriptor.attributes[1].offset = MemoryLayout<RayPlaneVertex>.offset(of: \RayPlaneVertex.rayNormal)!
         imagePlaneVertexDescriptor.attributes[1].bufferIndex = Int(kBufferIndexMeshPositions.rawValue)
         
+        let stride =  MemoryLayout<float2>.stride +  MemoryLayout<float3>.stride
+        let rpstride = MemoryLayout<RayPlaneVertex>.stride
+      
+        
         // Buffer Layout
-        imagePlaneVertexDescriptor.layouts[0].stride = 16
+        imagePlaneVertexDescriptor.layouts[0].stride = MemoryLayout<RayPlaneVertex>.stride
         imagePlaneVertexDescriptor.layouts[0].stepRate = 1
         imagePlaneVertexDescriptor.layouts[0].stepFunction = .perVertex
         
         // Create a pipeline state for rendering the captured image
         let capturedImagePipelineStateDescriptor = MTLRenderPipelineDescriptor()
-        capturedImagePipelineStateDescriptor.label = "MyCapturedImagePipeline"
+        capturedImagePipelineStateDescriptor.label = "SDFPipeline"
         capturedImagePipelineStateDescriptor.sampleCount = renderDestination.sampleCount
         capturedImagePipelineStateDescriptor.vertexFunction = capturedImageVertexFunction
         capturedImagePipelineStateDescriptor.fragmentFunction = capturedImageFragmentFunction
@@ -180,7 +183,7 @@ class SDFRenderer:ARMetalDrawable {
         do {
             try pipelineState = device.makeRenderPipelineState(descriptor: capturedImagePipelineStateDescriptor)
         } catch let error {
-            print("Failed to created captured image pipeline state, error \(error)")
+            print("Failed to created sdf pipeline state, error \(error)")
         }
         
         let capturedImageDepthStateDescriptor = MTLDepthStencilDescriptor()

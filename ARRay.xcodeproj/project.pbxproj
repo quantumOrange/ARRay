@@ -227,13 +227,16 @@
 				TargetAttributes = {
 					5480FCEF2216D9E60014AB19 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1160;
 					};
 					5480FD092216D9E80014AB19 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1160;
 						TestTargetID = 5480FCEF2216D9E60014AB19;
 					};
 					5480FD142216D9E80014AB19 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1160;
 						TestTargetID = 5480FCEF2216D9E60014AB19;
 					};
 				};
@@ -486,7 +489,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.crooks.ARRay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "ARRay/ARRay-Bridging-Header.h";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -505,7 +508,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.crooks.ARRay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "ARRay/ARRay-Bridging-Header.h";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -516,6 +519,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 84Y3R5UC5Q;
 				INFOPLIST_FILE = ARRayTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -524,7 +528,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.crooks.ARRayTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ARRay.app/ARRay";
 			};
@@ -536,6 +540,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 84Y3R5UC5Q;
 				INFOPLIST_FILE = ARRayTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -544,7 +549,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.crooks.ARRayTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ARRay.app/ARRay";
 			};
@@ -555,6 +560,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 84Y3R5UC5Q;
 				INFOPLIST_FILE = ARRayUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -563,7 +569,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.crooks.ARRayUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = ARRay;
 			};
@@ -574,6 +580,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 84Y3R5UC5Q;
 				INFOPLIST_FILE = ARRayUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -582,7 +589,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.crooks.ARRayUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = ARRay;
 			};

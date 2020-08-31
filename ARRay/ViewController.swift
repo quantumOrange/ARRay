@@ -77,8 +77,7 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
             
             // Add a new anchor to the session
             let anchor = ARAnchor(transform: transform)
-            //let an2 = ARAnchor(
-          //  lastId = anchor.identifier
+            
             session.add(anchor: anchor)
             let origin = float4(0,0,0,1)
             

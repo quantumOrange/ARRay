@@ -46,7 +46,12 @@ typedef struct {
     // Camera Uniforms
     matrix_float4x4 projectionMatrix;
     matrix_float4x4 viewMatrix;
+    vector_float3 cameraPosition;
     
+    
+    float time;
+    float aspectRatio;
+    vector_float3 objectPosition;
     
     vector_float2  pixelSize;
     // Lighting Properties

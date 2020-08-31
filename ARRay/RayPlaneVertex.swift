@@ -64,6 +64,7 @@ func createRayPlaneVerticies(frame:ARFrame, size:CGSize, orientation:UIInterface
     }
     
     let rayNormals = spacePoints.map {
+       
         return simd_normalize(cameraPoition - $0)
     }
     

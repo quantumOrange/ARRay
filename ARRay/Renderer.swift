@@ -142,6 +142,10 @@ class Renderer {
             */
             
             capturedImage.draw(renderEncoder: renderEncoder,sharedUniformBuffer:sharedUniformBuffer,sharedUniformBufferOffset: sharedUniformBufferOffset)
+            
+            
+            sdf.draw(renderEncoder: renderEncoder,sharedUniformBuffer:sharedUniformBuffer,sharedUniformBufferOffset: sharedUniformBufferOffset)
+            /*
             switch displayMode {
             case .cubes:
                 cubes.draw(renderEncoder: renderEncoder,sharedUniformBuffer:sharedUniformBuffer,sharedUniformBufferOffset: sharedUniformBufferOffset)
@@ -152,7 +156,7 @@ class Renderer {
                 points.draw(renderEncoder: renderEncoder,sharedUniformBuffer:sharedUniformBuffer,sharedUniformBufferOffset: sharedUniformBufferOffset)
             }
             
-            
+            */
             
             // We're done encoding commands
             renderEncoder.endEncoding()
@@ -209,10 +213,10 @@ class Renderer {
         }
         
         updateSharedUniforms(frame: currentFrame)
-        /*
-        cubes.update(frame: currentFrame)
-        capturedImage.update(frame: currentFrame)
-        */
+        
+        
+        
+        sdf.update(frame: currentFrame)
         
         drawables.forEach{
             $0.update(frame: currentFrame)
@@ -223,6 +227,7 @@ class Renderer {
     func drawRectResized(size: CGSize) {
         viewportSize = size
         capturedImage.drawRectResized(size: size)
+        sdf.drawRectResized(size: size)
        // viewportSizeDidChange = true
     }
     

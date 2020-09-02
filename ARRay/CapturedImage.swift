@@ -34,7 +34,6 @@ class CapturedImage:ARMetalDrawable {
     // Captured image texture cache
     var capturedImageTextureCache: CVMetalTextureCache!
     
-    
     // The current viewport size
     var viewportSize: CGSize = CGSize()
     
@@ -43,7 +42,6 @@ class CapturedImage:ARMetalDrawable {
     
     
     func update(frame: ARFrame) {
-        
         updateCapturedImageTextures(frame: frame)
         
         if viewportSizeDidChange {

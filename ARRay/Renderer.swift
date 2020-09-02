@@ -64,13 +64,11 @@ class Renderer {
      var sharedUniformBufferOffset: Int = 0
     
     // Offset within _anchorUniformBuffer to set for the current frame
-  //  var anchorUniformBufferOffset: Int = 0
+    // var anchorUniformBufferOffset: Int = 0
     
     // Addresses to write shared uniforms to each frame
      var sharedUniformBufferAddress: UnsafeMutableRawPointer!
     
-    let points:Points
-    let cubes:Cubes
     let capturedImage:CapturedImage
     let sdf:SDFRenderer
     let drawables:[ARMetalDrawable]
@@ -85,12 +83,12 @@ class Renderer {
         self.renderDestination.colorPixelFormat = .bgra8Unorm
         self.renderDestination.sampleCount = 1
         
-        self.cubes = Cubes(device:device, destination:renderDestination)
+       
         self.capturedImage = CapturedImage(device:device, destination:renderDestination)
         self.sdf = SDFRenderer(device: device, destination: renderDestination)
-        self.points = Points(device:device, destination:renderDestination)
+       
         
-        self.drawables = [ capturedImage, cubes, points];
+        self.drawables = [ capturedImage ];
         
         loadMetal()
         
@@ -246,6 +244,8 @@ class Renderer {
         
         uniforms.pointee = sharedUniforms
         
+        
+        uniforms.pointee.time = Float(CACurrentMediaTime());
         let origin = SIMD4<Float>(0,0,0,1)
         let cameraPoition4d = simd_mul(frame.camera.transform, origin)
         let cameraPoition = SIMD3<Float>(cameraPoition4d.x,cameraPoition4d.y,cameraPoition4d.z)
@@ -281,26 +281,6 @@ class Renderer {
         sharedUniforms = uniforms.pointee
     }
     
-    /*
-    func updateAnchors(frame: ARFrame) {
-       updateCubeAnchor(frame: frame)
-    }
-    
-    func updatePointAnchor(frame: ARFrame) {
-        
-    }
- 
-    func updateCapturedImageTextures(frame: ARFrame) {
-        
-    }
-    
-    
-    
-    func drawCapturedImage(renderEncoder: MTLRenderCommandEncoder) {
-       
-    }
-    
-    */
 }
 
 

@@ -51,8 +51,6 @@ func createRayPlaneVerticies(frame:ARFrame, size:CGSize, orientation:UIInterface
     return zip( positions, rayNormals ).map(RayPlaneVertex.init)
 }
 
-
-
 func getScreenParallelPlane(frame:ARFrame) ->  simd_float4x4 {
     
     var translation = matrix_identity_float4x4
@@ -66,7 +64,6 @@ func getScreenParallelPlane(frame:ARFrame) ->  simd_float4x4 {
     let rotation = float4x4(simd_quatf(angle: 0.5 * .pi ,
                                        axis: xAxis))
     
-     
     return simd_mul(transform,rotation)
 }
 

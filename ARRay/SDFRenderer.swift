@@ -20,9 +20,11 @@ class SDFRenderer:ARMetalDrawable {
     var vertexBuffer: MTLBuffer!
     var depthState: MTLDepthStencilState!
     
-    //var textureY: CVMetalTexture?
-    //var textureCbCr: CVMetalTexture?
-    
+    var sceneEnviromentTexture:MTLTexture?
+    var objectEnviromentTexture:MTLTexture?
+   
+    var cubeMap:MTLTexture? { objectEnviromentTexture ?? sceneEnviromentTexture }
+
     // Captured image texture cache
     var capturedImageTextureCache: CVMetalTextureCache!
     
@@ -61,8 +63,10 @@ class SDFRenderer:ARMetalDrawable {
     
     func draw(renderEncoder: MTLRenderCommandEncoder, sharedUniformBuffer: MTLBuffer, sharedUniformBufferOffset: Int) {
         
-        guard  let pipelineState = pipelineState
+        guard   let pipelineState = pipelineState,
+                let cubeMap = cubeMap
                                                     else { return }
+        
         // Push a debug group allowing us to identify render commands in the GPU Frame Capture tool
         renderEncoder.pushDebugGroup("Draw SDF ")
         
@@ -76,6 +80,8 @@ class SDFRenderer:ARMetalDrawable {
         
         renderEncoder.setFragmentBuffer(sharedUniformBuffer, offset: sharedUniformBufferOffset, index: Int(kBufferIndexSharedUniforms.rawValue))
         
+         //[commandEncoder setFragmentTexture:self.cubeTexture atIndex:0];
+        renderEncoder.setFragmentTexture(cubeMap, index: Int(kTextureIndexCube.rawValue))
         // Draw each submesh of our mesh
         renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
         
@@ -144,7 +150,6 @@ class SDFRenderer:ARMetalDrawable {
                    attachmentDescriptor.destinationAlphaBlendFactor = MTLBlendFactor.oneMinusSourceAlpha
                }
                
-        
         do {
             try pipelineState = device.makeRenderPipelineState(descriptor: sdfPipelineStateDescriptor)
         } catch let error {

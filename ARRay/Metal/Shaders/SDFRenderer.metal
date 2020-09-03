@@ -41,15 +41,6 @@ struct Lights {
     
 };
 
-/*
- PointLight  light1,light2,light3;
- DirectionalLight dirLight;
- 
- Material blackMat,whiteMat,bluishMat,yellowMat,oscMat,tableMat,tableDarkMat;
- 
- */
-
-
 Materials createMaterials( ) {
     Materials m;
     
@@ -61,16 +52,8 @@ Materials createMaterials( ) {
     m.white.color.specular = 0.3*float3(1.0,1.0,0.9);
     m.white.shininess = 16.0;
     
-    //blackMat = Material(LightColor(float3(0.0,0.0,0.01),float3(0.1,0.1,0.1)) , 35.0);
-    //whiteMat = Material(LightColor(0.75*float3(1.0,1.0,0.9),0.3*float3(1.0,1.0,0.9)) ,shininess );
-    
-    
     return m;
 }
-
-
-
-
 
 //////////////////////////////////////////////////////////////////////
 /////////////////////// Map The Scene ////////////////////////////////
@@ -179,18 +162,9 @@ Trace traceRay(Ray ray, float maxDistance, Materials m, Model model) {
         
     }
     
-    
-    
     return Trace(dist,p,ray,mv.material,hit);
 }
-/*
-Trace traceRay(Ray ray, float maxDistance, Materials m, Model model){
-    Trace trace = castRay(ray,  maxDistance,  m, center);
-    trace.normal = calculateNormal(trace.p);
-    trace.reflection = Ray(trace.p,reflect(ray.direction, trace.normal));
-    return trace;
-}
-*/
+
 float castShadow(Ray ray, float dist, Materials m, Model model){
     Trace trace = traceRay(ray, dist, m, model);
     float maxDist = min(1.0,dist);
@@ -198,33 +172,14 @@ float castShadow(Ray ray, float dist, Materials m, Model model){
     
     return clamp(result,0.0,1.0);
 }
-/*
-Ray cameraRay(float3 viewPoint, float3 lookAtCenter, float2 p , float d){
-    float3 v = normalize(lookAtCenter -viewPoint);
-    
-    float3 n1 = cross(v,float3(0.0,1.0,0.0));
-    float3 n2 = cross(n1,v);
-    
-    float3 lookAtPoint = lookAtCenter + d*(p.y*n2 + p.x*n1);
-    
-    Ray ray(viewPoint,normalize(lookAtPoint - viewPoint) );
-    
-    //ray.origin = viewPoint;
-    //ray.direction =  normalize(lookAtPoint - viewPoint);
-    
-    return ray;
-}
-*/
+
 /////////////////////// Lighting ////////////////////////////////
 
-
 float3 pointLighting(Trace trace, float3 normal, PointLight light, Materials m,Model model){
-   float3 lightDir = light.position - trace.p;
-   float d = length(lightDir);
-   lightDir = normalize(lightDir);
-    
-
-    float3 color = pointLighting(trace, normal, light);
+    float3 lightDir = light.position - trace.p;
+    float d = length(lightDir);
+    lightDir = normalize(lightDir);
+    float3 color = pointLighting(trace, normal, light,lightDir);
     float shadow = castShadow(Ray(trace.p,lightDir),d,m,model);
     color *= shadow;
     return  color;
@@ -266,11 +221,9 @@ float4 render(Ray ray, Materials m, Lights lights,Model model,texturecube<float>
     float3 normal = calculateNormal(trace.p,m,model);
     
     float3 reflection = reflect(ray.direction, normal);
-    
-    // reflection.xy =  reflection.yx;
-    // reflection.z = -reflection.z;
+
     float4 color = cubeTexture.sample(cubeSampler,reflection);
-    //float3 color = lighting(trace,normal,lights,m,center);
+
     float alpha = trace.hit ? 1.0 : 0.0 ;
     return float4(color.rgb,alpha);
 }

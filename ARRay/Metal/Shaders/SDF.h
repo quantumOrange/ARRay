@@ -13,6 +13,7 @@ using namespace metal;
 
 #define TWO_PI 6.283185
 #define PI 3.14159265359
+
 //Golden mean and inverse -  for the icosohedron and dodecadron
 #define PHI 1.6180339887
 #define INV_PHI 0.6180339887

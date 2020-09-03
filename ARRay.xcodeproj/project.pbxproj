@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		540D4E7F2217316D00EA4F11 /* Points.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540D4E7D2217316C00EA4F11 /* Points.swift */; };
 		540D4E802217316D00EA4F11 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540D4E7E2217316D00EA4F11 /* Util.swift */; };
 		540D4E8C221734AE00EA4F11 /* RayPlaneVertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540D4E8B221734AE00EA4F11 /* RayPlaneVertex.swift */; };
 		540D4E8E2217396800EA4F11 /* SDFRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540D4E8D2217396800EA4F11 /* SDFRenderer.swift */; };
@@ -45,7 +44,6 @@
 /* Begin PBXFileReference section */
 		5404E98524FFB833003DDDB8 /* SDF.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDF.h; sourceTree = "<group>"; };
 		5404E98624FFBA0B003DDDB8 /* Lighting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Lighting.h; sourceTree = "<group>"; };
-		540D4E7D2217316C00EA4F11 /* Points.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Points.swift; sourceTree = "<group>"; };
 		540D4E7E2217316D00EA4F11 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		540D4E8B221734AE00EA4F11 /* RayPlaneVertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RayPlaneVertex.swift; sourceTree = "<group>"; };
 		540D4E8D2217396800EA4F11 /* SDFRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SDFRenderer.swift; sourceTree = "<group>"; };
@@ -102,10 +100,23 @@
 				5480FCF52216D9E60014AB19 /* CapturedImage.metal */,
 				540D4E8F22174D3500EA4F11 /* SDFRenderer.metal */,
 				5404E98624FFBA0B003DDDB8 /* Lighting.h */,
-				5480FCF72216D9E60014AB19 /* ShaderTypes.h */,
 				5404E98524FFB833003DDDB8 /* SDF.h */,
+				5480FCF72216D9E60014AB19 /* ShaderTypes.h */,
 			);
 			path = Shaders;
+			sourceTree = "<group>";
+		};
+		5404E98924FFFC49003DDDB8 /* Metal */ = {
+			isa = PBXGroup;
+			children = (
+				5404E98724FFD60A003DDDB8 /* Shaders */,
+				5480FD2B2216DB2A0014AB19 /* ARMetalDrawable.swift */,
+				5480FD272216DAFC0014AB19 /* CapturedImage.swift */,
+				540D4E8D2217396800EA4F11 /* SDFRenderer.swift */,
+				540D4E8B221734AE00EA4F11 /* RayPlaneVertex.swift */,
+				5480FCF82216D9E60014AB19 /* Renderer.swift */,
+			);
+			path = Metal;
 			sourceTree = "<group>";
 		};
 		5480FCE72216D9E60014AB19 = {
@@ -132,14 +143,8 @@
 			isa = PBXGroup;
 			children = (
 				5480FCF32216D9E60014AB19 /* AppDelegate.swift */,
-				5404E98724FFD60A003DDDB8 /* Shaders */,
-				5480FD2B2216DB2A0014AB19 /* ARMetalDrawable.swift */,
-				5480FD272216DAFC0014AB19 /* CapturedImage.swift */,
-				540D4E8D2217396800EA4F11 /* SDFRenderer.swift */,
-				540D4E8B221734AE00EA4F11 /* RayPlaneVertex.swift */,
-				540D4E7D2217316C00EA4F11 /* Points.swift */,
+				5404E98924FFFC49003DDDB8 /* Metal */,
 				540D4E7E2217316D00EA4F11 /* Util.swift */,
-				5480FCF82216D9E60014AB19 /* Renderer.swift */,
 				5480FCFA2216D9E60014AB19 /* ViewController.swift */,
 				5480FCFC2216D9E60014AB19 /* Main.storyboard */,
 				5480FCFF2216D9E80014AB19 /* Assets.xcassets */,
@@ -309,7 +314,6 @@
 				5480FD2C2216DB2A0014AB19 /* ARMetalDrawable.swift in Sources */,
 				5480FCF92216D9E60014AB19 /* Renderer.swift in Sources */,
 				540D4E9022174D3500EA4F11 /* SDFRenderer.metal in Sources */,
-				540D4E7F2217316D00EA4F11 /* Points.swift in Sources */,
 				5480FCFB2216D9E60014AB19 /* ViewController.swift in Sources */,
 				5480FCF42216D9E60014AB19 /* AppDelegate.swift in Sources */,
 				540D4E8C221734AE00EA4F11 /* RayPlaneVertex.swift in Sources */,

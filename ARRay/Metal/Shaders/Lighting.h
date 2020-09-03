@@ -60,12 +60,17 @@ float3 pointLighting(Trace trace, float3 normal, PointLight light){
     float d = length(lightDir);
     lightDir = normalize(lightDir);
     
+    return pointLighting(trace, normal, light,lightDir);
+}
+
+float3 pointLighting(Trace trace, float3 normal, PointLight light,float3 lightDir){
+    
     float3 color =  diffuseLighting(trace, normal, light.color.diffuse, lightDir);
     
     color += specularLighting(trace, normal, light.color.specular, lightDir);
     
     float  attenuation = 1.0 / (1.0 +  0.1 * d * d);
-    //float shadow = castShadow(Ray(trace.p,lightDir),d,m,center );
+    
     color *= attenuation;
     return  color;
 }
@@ -76,8 +81,6 @@ float3 directionalLighting(Trace trace, float3 normal, DirectionalLight light){
     
     color += specularLighting(trace, normal, light.color.specular, light.direction);
     
-   // float shadow = castShadow(Ray(trace.p,light.direction),3.0,m,center);
-    //color *= shadow;
     return  color;
 }
 

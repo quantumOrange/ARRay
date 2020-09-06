@@ -22,6 +22,7 @@
 		5480FD1A2216D9E80014AB19 /* ARRayUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5480FD192216D9E80014AB19 /* ARRayUITests.swift */; };
 		5480FD282216DAFC0014AB19 /* CapturedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5480FD272216DAFC0014AB19 /* CapturedImage.swift */; };
 		5480FD2C2216DB2A0014AB19 /* ARMetalDrawable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5480FD2B2216DB2A0014AB19 /* ARMetalDrawable.swift */; };
+		54CBB0772505088B00FD9ED7 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 54CBB0762505088B00FD9ED7 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		5480FD1B2216D9E80014AB19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5480FD272216DAFC0014AB19 /* CapturedImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CapturedImage.swift; sourceTree = "<group>"; };
 		5480FD2B2216DB2A0014AB19 /* ARMetalDrawable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARMetalDrawable.swift; sourceTree = "<group>"; };
+		54CBB0762505088B00FD9ED7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 		5480FCE72216D9E60014AB19 = {
 			isa = PBXGroup;
 			children = (
+				54CBB0762505088B00FD9ED7 /* README.md */,
 				5480FCF22216D9E60014AB19 /* ARRay */,
 				5480FD0D2216D9E80014AB19 /* ARRayTests */,
 				5480FD182216D9E80014AB19 /* ARRayUITests */,
@@ -282,6 +285,7 @@
 			files = (
 				5480FD032216D9E80014AB19 /* LaunchScreen.storyboard in Resources */,
 				5480FD002216D9E80014AB19 /* Assets.xcassets in Resources */,
+				54CBB0772505088B00FD9ED7 /* README.md in Resources */,
 				5480FCFE2216D9E60014AB19 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

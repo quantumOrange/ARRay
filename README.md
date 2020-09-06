@@ -1,7 +1,7 @@
 # AR-Ray
 Augumented Reality iOS app using ARKit and Metal. We use  signed difference functions and ray marching to render an animated liquid metal blob floating in the enviroment. Tap on the screen to place the blob.
 
-![iphone screen shot](iPhone-screentshot.png)
+![iphone screen shot](iPhone-screentshot.png =250x)
 
 ## Signed Distance Functions
 

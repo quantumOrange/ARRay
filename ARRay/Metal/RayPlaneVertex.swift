@@ -39,9 +39,8 @@ func createRayPlaneVerticies(frame:ARFrame, size:CGSize, orientation:UIInterface
                             CGPoint(x: size.width, y:  0.0)
                         ]
     
-    let spacePoints = screenPoints.compactMap {
-        return frame.camera.unprojectPoint($0, ontoPlane: plane, orientation:orientation, viewportSize: size)
-    }
+    let spacePoints = screenPoints
+                        .compactMap { frame.camera.unprojectPoint($0, ontoPlane: plane, orientation:orientation, viewportSize: size) }
     
     let rayNormals = spacePoints.map {
         return simd_normalize($0-cameraPoition)

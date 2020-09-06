@@ -179,7 +179,7 @@ float3 pointLighting(Trace trace, float3 normal, PointLight light, Materials m,M
     float3 lightDir = light.position - trace.p;
     float d = length(lightDir);
     lightDir = normalize(lightDir);
-    float3 color = pointLighting(trace, normal, light,lightDir);
+    float3 color = pointLighting(trace, normal, light,lightDir,d);
     float shadow = castShadow(Ray(trace.p,lightDir),d,m,model);
     color *= shadow;
     return  color;

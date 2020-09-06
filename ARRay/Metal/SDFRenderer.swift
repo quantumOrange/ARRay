@@ -16,15 +16,16 @@ class SDFRenderer:ARMetalDrawable {
     var pipelineState: MTLRenderPipelineState?
     var renderDestination:RenderDestinationProvider
     
-    
     var vertexBuffer: MTLBuffer!
     var depthState: MTLDepthStencilState!
     
     var sceneEnviromentTexture:MTLTexture?
     var objectEnviromentTexture:MTLTexture?
    
-    var cubeMap:MTLTexture? { objectEnviromentTexture ?? sceneEnviromentTexture }
-
+    // TODO: fix objectEnviromentTexture coords in the shader by inverting the objectProbe transform. Just using scene probe for now as that has an identity transform.
+    // var cubeMap:MTLTexture? { objectEnviromentTexture ?? sceneEnviromentTexture }
+    var cubeMap:MTLTexture? {  sceneEnviromentTexture }
+    
     // Captured image texture cache
     var capturedImageTextureCache: CVMetalTextureCache!
     
@@ -34,12 +35,10 @@ class SDFRenderer:ARMetalDrawable {
     // Flag for viewport size changes
     var viewportSizeDidChange: Bool = false
     
-    
     func update(frame: ARFrame) {
         let verticies = createRayPlaneVerticies(frame: frame, size: viewportSize, orientation: .landscapeRight)
         vertexBuffer?.contents().copyMemory(from: verticies, byteCount: verticies.byteLength)
     }
-    
     
     func drawRectResized(size: CGSize) {
         viewportSize = size

@@ -18,7 +18,6 @@ let kImagePlaneVertexData: [Float] = [
     1.0,  1.0,  1.0, 0.0,
 ]
 
-
 class CapturedImage:ARMetalDrawable {
     var pipelineState: MTLRenderPipelineState?
     var renderDestination:RenderDestinationProvider

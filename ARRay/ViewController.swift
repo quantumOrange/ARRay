@@ -202,7 +202,6 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
         manualProbe.lastUpdateTime = CACurrentMediaTime()
         manualProbe.requiresRefresh = false
 
-        //self.manualProbe = manualProbe
     }
 
     /// - Tag: FallbackEnvironmentProbe
@@ -227,7 +226,7 @@ class ViewController: UIViewController, MTKViewDelegate, ARSessionDelegate {
     
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         updateSceneEnvironmentProbe(for: frame)
-        //updateSessionInfoLabel(for: frame, trackingState: frame.camera.trackingState)
+        
     }
     
     func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
